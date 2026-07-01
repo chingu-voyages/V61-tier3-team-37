@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import type { ChangeEvent } from "react";
 import { KeyboardWrapper } from "../components/keyboard";
 
-const MyComponent = () => {
+const WordleMain = () => {
     const [input, setInput] = useState("");
     const keyboard = useRef<any>(null);
 
@@ -26,4 +26,4 @@ const MyComponent = () => {
     );
 };
 
-export default MyComponent;
+export default WordleMain;
