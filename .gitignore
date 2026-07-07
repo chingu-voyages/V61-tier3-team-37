@@ -36,3 +36,13 @@ venv/
 *.swp
 *.swo
 *.tmp
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+
+# OS
+.DS_Store
