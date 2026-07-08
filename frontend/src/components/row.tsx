@@ -1,8 +1,8 @@
 import React from 'react'
 
 export default function Row({ guess, currentGuess }: { guess?: { color: string; key: string }[]; currentGuess?: string }) {
-
-  if (guess) {
+//Guess 
+  if (guess && guess.length > 0) {
     return (
       <div className="row past">
         {guess.map((l, i) => (
