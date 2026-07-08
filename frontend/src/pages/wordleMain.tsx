@@ -1,16 +1,23 @@
 import React, { useState, useRef } from "react";
 import type { ChangeEvent } from "react";
 import { KeyboardWrapper } from "../components/keyboard";
+import Grid from "../components/basicGrid";
+
+const blankGuesses: { color: string; key: string }[][] = [[], [], [], [], [], []];
 
 const WordleMain = () => {
     const [input, setInput] = useState("");
+    const [currentGuess, setCurrentGuess] = useState("");
+    const [guesses] = useState(blankGuesses);
+    const [turn] = useState(0);
     const keyboard = useRef<any>(null);
 
     const onChangeInput = (event: ChangeEvent<HTMLInputElement>): void => {
-        const input = event.target.value;
-        setInput(input);
+        const value = event.target.value.toUpperCase().slice(0, 5);
+        setInput(value);
+        setCurrentGuess(value);
         if (keyboard.current) {
-            keyboard.current.setInput(input);
+            keyboard.current.setInput(value);
         }
     };
 
@@ -18,10 +25,18 @@ const WordleMain = () => {
         <div>
             <input
                 value={input}
-                placeholder={"Tap on the virtual keyboard to start"}
-                onChange={e => onChangeInput(e)}
+                placeholder="Type a guess or use the virtual keyboard"
+                onChange={onChangeInput}
             />
-            <KeyboardWrapper keyboardRef={(r: any) => (keyboard.current = r)} onChange={setInput} />
+            <Grid guesses={guesses} currentGuess={currentGuess} turn={turn} />
+            <KeyboardWrapper
+                keyboardRef={(r: any) => (keyboard.current = r)}
+                onChange={(value: string) => {
+                    const normalized = value.toUpperCase().slice(0, 5);
+                    setInput(normalized);
+                    setCurrentGuess(normalized);
+                }}
+            />
         </div>
     );
 };
