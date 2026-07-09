@@ -22,21 +22,18 @@ const WordleMain = () => {
     };
 
     return (
-        <div>
-            <input
-                value={input}
-                placeholder="Type a guess or use the virtual keyboard"
-                onChange={onChangeInput}
-            />
-            <Grid guesses={guesses} currentGuess={currentGuess} turn={turn} />
-            <KeyboardWrapper
-                keyboardRef={(r: any) => (keyboard.current = r)}
-                onChange={(value: string) => {
-                    const normalized = value.toUpperCase().slice(0, 5);
-                    setInput(normalized);
-                    setCurrentGuess(normalized);
-                }}
-            />
+        <div className="wordle-page">
+            <div className="game-container">
+                <Grid guesses={guesses} currentGuess={currentGuess} turn={turn} />
+                <KeyboardWrapper
+                    keyboardRef={(r: any) => (keyboard.current = r)}
+                    onChange={(value: string) => {
+                        const normalized = value.toUpperCase().slice(0, 5);
+                        setInput(normalized);
+                        setCurrentGuess(normalized);
+                    }}
+                />
+            </div>
         </div>
     );
 };
