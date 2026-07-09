@@ -110,12 +110,6 @@ const useWordle = (solution: string) => {
             setError('You already tried that word.')
             return
         }
-
-        if (currentGuess.length !== 5) {
-            setError('Word must be 5 chars.')
-            return
-        }
-
         setLoading(true)
         setError(null)
 
