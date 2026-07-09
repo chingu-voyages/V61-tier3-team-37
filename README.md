@@ -56,6 +56,34 @@ uvicorn main:app --reload
 
 The API will be available at `http://127.0.0.1:8000`.
 
+## Frontend Setup
+
+### Prerequisites
+- Node.js 18+ (or compatible version)
+- npm
+
+### Install
+1. Navigate to the frontend directory:
+   cd frontend
+   
+2. Install dependencies:
+   npm install
+### Run locally
+`
+npm run dev
+
+
+Open the local Vite URL shown in the terminal (typically `http://localhost:5173`).
+
+### Build for production
+```bash
+npm run build
+```
+
+### Notes
+- The frontend uses `frontend/package-lock.json`.
+- Only commit/push `frontend/package-lock.json` when updating frontend dependencies.
+
 ## Our Team
 
 Everyone on your team should add their name along with a link to their GitHub
