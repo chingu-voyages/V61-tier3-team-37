@@ -16,6 +16,8 @@ body {
   font-size: 1em;
   font-family: verdana;
   margin: 0;
+  background-color: rgba(210, 218, 221, 0.329);
+
 }
 
 .wordle-page {
@@ -55,6 +57,7 @@ h1 {
   display: flex;
   justify-content: center;
 }
+
 
 .row>div {
   display: block;
