@@ -30,15 +30,19 @@ Meeting Agenda templates (located in the `/docs` directory in this repo):
 ## Backend Setup
 
 ### Prerequisites
+
 - Python 3.9+
 
 ### Installation
+
 1. Navigate to the backend directory:
+
    ```bash
    cd backend
    ```
 
 2. Create and activate a virtual environment:
+
    ```bash
    python3 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
@@ -50,6 +54,7 @@ Meeting Agenda templates (located in the `/docs` directory in this repo):
    ```
 
 ### Running the Server
+
 ```bash
 uvicorn main:app --reload
 ```
@@ -59,28 +64,32 @@ The API will be available at `http://127.0.0.1:8000`.
 ## Frontend Setup
 
 ### Prerequisites
+
 - Node.js 18+ (or compatible version)
 - npm
 
 ### Install
+
 1. Navigate to the frontend directory:
    cd frontend
-   
 2. Install dependencies:
    npm install
+
 ### Run locally
+
 `
 npm run dev
-
 
 Open the local Vite URL shown in the terminal (typically `http://localhost:5173`).
 
 ### Build for production
+
 ```bash
 npm run build
 ```
 
 ### Notes
+
 - The frontend uses `frontend/package-lock.json`.
 - Only commit/push `frontend/package-lock.json` when updating frontend dependencies.
 
