@@ -1,62 +1,30 @@
 import { useState } from 'react'
 import { wordleApi } from '../services/wordleService'
-import type { WordGuessStatus } from '../types/word'
+import type { GuessResponse, TileColor } from '../types/word'
 
 type FormattedLetter = {
     key: string
-    color: string
+    color: TileColor
 }
 
 const isValidLetterKey = (key: string) => /^[A-Za-z]$/.test(key)
 
-const useWordle = (solution: string) => {
+const useWordle = () => {
     const [turn, setTurn] = useState(0)
     const [currentGuess, setCurrentGuess] = useState('')
     const [guesses, setGuesses] = useState<Array<FormattedLetter[] | null>>([...Array(6)])
     const [history, setHistory] = useState<string[]>([])
     const [isCorrect, setIsCorrect] = useState(false)
-    const [usedKeys, setUsedKeys] = useState<Record<string, string>>({})
+    const [usedKeys, setUsedKeys] = useState<Record<string, TileColor>>({})
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const [lastResponse, setLastResponse] = useState<WordGuessStatus | null>(null)
+    const [lastResponse, setLastResponse] = useState<GuessResponse | null>(null)
 
-    const formatGuess = () => {
-        const solutionArray: Array<string | null> = [...solution]
-        const formattedGuess: FormattedLetter[] = [...currentGuess].map((letter) => ({
-            key: letter,
-            color: 'grey',
+    const normalizeResponse = (response: GuessResponse): FormattedLetter[] => {
+        return response.feedback.map((letter) => ({
+            key: letter.letter.toUpperCase(),
+            color: letter.status === 'green' ? 'green' : letter.status === 'yellow' ? 'yellow' : 'grey',
         }))
-
-        formattedGuess.forEach((letter, index) => {
-            if (solution[index] === letter.key) {
-                formattedGuess[index].color = 'green'
-                solutionArray[index] = null
-            }
-        })
-
-        formattedGuess.forEach((letter, index) => {
-            if (letter.color !== 'green' && solutionArray.includes(letter.key)) {
-                formattedGuess[index].color = 'yellow'
-                solutionArray[solutionArray.indexOf(letter.key)] = null
-            }
-        })
-
-        return formattedGuess
-    }
-
-    const normalizeResponse = (response: WordGuessStatus): FormattedLetter[] => {
-        if (!response || !Array.isArray(response.lettersResponse)) {
-            return []
-        }
-
-        return response.lettersResponse.map((letter: any) => {
-            const key = letter.key ?? letter.letter ?? letter.value ?? ''
-            const color = letter.color ?? letter.status ?? 'grey'
-            return {
-                key: String(key),
-                color: String(color),
-            }
-        })
     }
 
     const addNewGuess = (formattedGuess: FormattedLetter[]) => {
@@ -110,19 +78,15 @@ const useWordle = (solution: string) => {
             setError('You already tried that word.')
             return
         }
+
         setLoading(true)
         setError(null)
 
         try {
-            const response = await wordleApi.submitGuess({ word: currentGuess })
+            const response = await wordleApi.submitGuess(currentGuess)
             setLastResponse(response)
 
-            const formattedResponse = normalizeResponse(response)
-            if (formattedResponse.length === 5) {
-                addNewGuess(formattedResponse)
-            } else {
-                addNewGuess(formatGuess())
-            }
+            addNewGuess(normalizeResponse(response))
         } catch (submitError) {
             console.error('Wordle submit error:', submitError)
             setError('Unable to submit guess. Please try again.')

@@ -1,7 +1,7 @@
 import axios from 'axios';
-import type { WordGuessStatus, WordGuess } from '../types/word';
+import type { GuessResponse, WordGuess, WordResponse } from '../types/word';
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'http://localhost:8000';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -11,15 +11,17 @@ const api = axios.create({
 });
 
 export const wordleApi = {
-    getWordResponse: async (): Promise<WordGuessStatus[]> => {
-        const response = await api.get<WordGuessStatus[]>('/word');
+    getWordResponse: async (): Promise<WordResponse> => {
+        const response = await api.get<WordResponse>('/word');
         return response.data;
     },
 
-    // Create new task
-    submitGuess: async (wordGuess: WordGuess): Promise<WordGuessStatus> => {
-        const response = await api.post<WordGuessStatus >('/guess', wordGuess);
+    submitGuess: async (guessOrPayload: string | WordGuess): Promise<GuessResponse> => {
+        const payload = typeof guessOrPayload === 'string'
+            ? { guess: guessOrPayload }
+            : guessOrPayload;
+
+        const response = await api.post<GuessResponse>('/guess', payload);
         return response.data;
     },
-
 };
