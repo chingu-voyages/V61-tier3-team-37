@@ -1,0 +1,48 @@
+# Node.js dependencies
+node_modules/
+/frontend/node_modules/
+
+# Vite build output
+/frontend/dist/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime data
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.*
+
+# IDE/editor folders
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+.venv/
+venv/
+
+# Misc
+*.swp
+*.swo
+*.tmp
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+
+# OS
+.DS_Store
