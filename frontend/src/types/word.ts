@@ -1,8 +1,18 @@
+export interface LetterFeedback {
+  letter: string;
+  status: "green" | "yellow" | "grey";
+}
 
-export interface WordGuessStatus {
-    lettersResponse: JSON[];
+export interface GuessResponse {
+  feedback: LetterFeedback[];
+  won: boolean;
 }
 
 export interface WordGuess {
-    word: string;
+  guess: string;
+}
+
+export interface WordResponse {
+  date: string;
+  status: string;
 }

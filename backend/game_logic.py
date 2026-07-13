@@ -32,7 +32,7 @@ def check_guess(guess: str, word_of_day: str):
             greens[i] = True
             word_of_day_counts[guess[i]] -= 1
         else:
-            result.append({"letter": guess[i], "status": "gray"}) # can be marked as yellow in the second pass
+            result.append({"letter": guess[i], "status": "grey"}) # can be marked as yellow in the second pass
 
     # Second pass: mark yellows
     for i in range(5):
