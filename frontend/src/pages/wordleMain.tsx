@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { KeyboardWrapper } from "../components/keyboard";
 import Grid from "../components/basicGrid";
+import { useKeyboard } from "../hooks/useKeyboard";
 import { wordleApi } from "../services/wordleService";
 import type { Tile, TileColor } from "../types/word";
 
@@ -23,9 +24,15 @@ const WordleMain = () => {
     const [message, setMessage] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [keyboard, setKeyboard] = useState<any>(null);
+    const currentGuessRef = useRef(currentGuess);
+
+    useEffect(() => {
+        currentGuessRef.current = currentGuess;
+    }, [currentGuess]);
 
     const handleKeyboardInput = (value: string) => {
         const normalized = value.toUpperCase().slice(0, MAX_LENGTH);
+        currentGuessRef.current = normalized;
         setCurrentGuess(normalized);
     };
 
@@ -45,8 +52,26 @@ const WordleMain = () => {
         }
     };
 
+    const handlePhysicalKey = (key: string) => {
+        if (key === "Enter") {
+            void submitGuess();
+            return;
+        }
+
+        if (key === "Backspace") {
+            setCurrentGuess((prev) => prev.slice(0, -1));
+            return;
+        }
+
+        if (/^[A-Za-z]$/.test(key)) {
+            setCurrentGuess((prev) => (prev.length < MAX_LENGTH ? prev + key.toUpperCase() : prev));
+        }
+    };
+
+    useKeyboard(handlePhysicalKey, gameState === "playing");
+
     const submitGuess = async () => {
-        const normalizedGuess = currentGuess.trim().toUpperCase();
+        const normalizedGuess = currentGuessRef.current.trim().toUpperCase();
 
         if (normalizedGuess.length !== MAX_LENGTH) {
             setMessage("Enter a 5-letter guess.");
