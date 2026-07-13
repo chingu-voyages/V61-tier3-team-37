@@ -26,19 +26,9 @@ class GuessRequest(BaseModel):
     guess: str
 
 
-def get_daily_word():
-    today = date.today().isoformat()
-    if getattr(app.state, "word_of_day", None) and getattr(app.state, "word_of_day_date", None) == today:
-        return app.state.word_of_day
-
-    app.state.word_of_day = get_word_of_day(ANSWERS)
-    app.state.word_of_day_date = today
-    return app.state.word_of_day
-
-
 @app.get("/word")
 def word_of_the_day():
-    get_daily_word()
+    get_word_of_day(ANSWERS)  
     return {"date": date.today().isoformat(), "status": "ready"}
 
 
@@ -48,8 +38,7 @@ def submit_guess(body: GuessRequest):
         raise HTTPException(status_code=400, detail="Guess must be a 5-letter word")
     if body.guess.lower() not in VALID_GUESSES:
         raise HTTPException(status_code=400, detail="Guess must be a valid word")
-
-    word_of_day = get_daily_word()
+    word_of_day = get_word_of_day(ANSWERS)
     feedback = check_guess(body.guess, word_of_day)
     won = all(f["status"] == "green" for f in feedback)
     return {"feedback": feedback, "won": won}
