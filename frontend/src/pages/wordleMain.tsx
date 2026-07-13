@@ -1,136 +1,110 @@
 import React, { useEffect, useRef, useState } from "react";
 import { KeyboardWrapper } from "../components/keyboard";
 import Grid from "../components/basicGrid";
-import { useKeyboard } from "../hooks/useKeyboard";
 import { wordleApi } from "../services/wordleService";
-import type { Tile, TileColor } from "../types/word";
 
-const MAX_GUESSES = 6;
-const MAX_LENGTH = 5;
-
-const createEmptyGuesses = (): Tile[][] => Array.from({ length: MAX_GUESSES }, () => []);
-
-const normalizeStatus = (status: string): TileColor => {
-    if (status === "green") return "green";
-    if (status === "yellow") return "yellow";
-    return "grey";
-};
+const blankGuesses: { color: string; key: string }[][] = [
+  [],
+  [],
+  [],
+  [],
+  [],
+  [],
+];
 
 const WordleMain = () => {
-    const [currentGuess, setCurrentGuess] = useState("");
-    const [guesses, setGuesses] = useState<Tile[][]>(createEmptyGuesses());
-    const [turn, setTurn] = useState(0);
-    const [gameState, setGameState] = useState<"playing" | "won" | "lost">("playing");
-    const [message, setMessage] = useState<string | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [keyboard, setKeyboard] = useState<any>(null);
-    const currentGuessRef = useRef(currentGuess);
+  const [input, setInput] = useState("");
+  const [currentGuess, setCurrentGuess] = useState("");
+  const [guesses, setGuesses] = useState(blankGuesses);
+  const [turn, setTurn] = useState(0);
+  const [gameOver, setGameOver] = useState<"won" | "lost" | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const keyboard = useRef<any>(null);
 
-    useEffect(() => {
-        currentGuessRef.current = currentGuess;
-    }, [currentGuess]);
+  const handleSubmit = async () => {
+    if (currentGuess.length !== 5 || turn >= 6 || gameOver) return;
 
-    const handleKeyboardInput = (value: string) => {
-        const normalized = value.toUpperCase().slice(0, MAX_LENGTH);
-        currentGuessRef.current = normalized;
-        setCurrentGuess(normalized);
-    };
+    setErrorMessage(null);
 
-    const handleKeyPress = (button: string) => {
-        if (button === "Enter") {
-            void submitGuess();
-            return;
-        }
+    try {
+      const result = await wordleApi.submitGuess({
+        guess: currentGuess.toLowerCase(),
+      });
 
-        if (button === "Backspace") {
-            setCurrentGuess((prev) => prev.slice(0, -1));
-            return;
-        }
+      const newGuess = result.feedback.map((f) => ({
+        key: f.letter,
+        color: f.status,
+      }));
 
-        if (/^[A-Za-z]$/.test(button)) {
-            setCurrentGuess((prev) => (prev.length < MAX_LENGTH ? prev + button.toUpperCase() : prev));
-        }
-    };
+      const newGuesses = [...guesses];
+      newGuesses[turn] = newGuess;
+      const nextTurn = turn + 1;
 
-    const handlePhysicalKey = (key: string) => {
-        if (key === "Enter") {
-            void submitGuess();
-            return;
-        }
+      setGuesses(newGuesses);
+      setTurn(nextTurn);
+      setInput("");
+      setCurrentGuess("");
+      if (keyboard.current) {
+        keyboard.current.clearInput();
+      }
 
-        if (key === "Backspace") {
-            setCurrentGuess((prev) => prev.slice(0, -1));
-            return;
-        }
+      if (result.won) {
+        setGameOver("won");
+      } else if (nextTurn >= 6) {
+        setGameOver("lost");
+      }
+    } catch (err: any) {
+      const detail = err?.response?.data?.detail;
+      setErrorMessage(detail ?? "Something went wrong. Please try again.");
+    }
+  };
 
-        if (/^[A-Za-z]$/.test(key)) {
-            setCurrentGuess((prev) => (prev.length < MAX_LENGTH ? prev + key.toUpperCase() : prev));
-        }
-    };
+  const onChangeInput = (event: ChangeEvent<HTMLInputElement>): void => {
+    const value = event.target.value.toUpperCase().slice(0, 5);
+    setInput(value);
+    setCurrentGuess(value);
+    if (keyboard.current) {
+      keyboard.current.setInput(value);
+    }
+  };
 
-    useKeyboard(handlePhysicalKey, gameState === "playing");
-
-    const submitGuess = async () => {
-        const normalizedGuess = currentGuessRef.current.trim().toUpperCase();
-
-        if (normalizedGuess.length !== MAX_LENGTH) {
-            setMessage("Enter a 5-letter guess.");
-            return;
-        }
-
-        if (gameState !== "playing") {
-            return;
-        }
-
-        setIsLoading(true);
-        setMessage(null);
-
-        try {
-            const response = await wordleApi.submitGuess(normalizedGuess);
-            const nextGuess = response.feedback.map((letter) => ({
-                key: letter.letter.toUpperCase(),
-                color: normalizeStatus(letter.status),
-            }));
-
-            const nextGuesses = [...guesses];
-            nextGuesses[turn] = nextGuess;
-            setGuesses(nextGuesses);
-
-            if (response.won) {
-                setGameState("won");
-                setMessage("You got it!");
-            } else if (turn + 1 >= MAX_GUESSES) {
-                setGameState("lost");
-                setMessage("No more guesses left.");
-            } else {
-                setTurn((prev) => prev + 1);
-            }
-
-            setCurrentGuess("");
-            if (keyboard) {
-                keyboard.setInput("");
-            }
-        } catch (error) {
-            console.error("Could not submit guess", error);
-            setMessage("The guess could not be validated. Try another word.");
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    return (
-        <div className="wordle-page">
-            <div className="game-container">
-                <Grid guesses={guesses} currentGuess={currentGuess} turn={turn} />
-                <p>{isLoading ? "Checking guess..." : message ?? (gameState === "won" ? "You solved it!" : gameState === "lost" ? "Try again tomorrow." : "Type or tap a 5-letter word.")}</p>
-                <KeyboardWrapper
-                    keyboardRef={(r: any) => setKeyboard(r)}
-                    onChange={handleKeyboardInput}
-                    onKeyPress={handleKeyPress}
-                />
-            </div>
-        </div>
-    );
+  return (
+    <div className="wordle-page">
+      <div className="game-container">
+        {gameOver === "won" && (
+          <p style={{ color: "green", fontWeight: "bold" }}>You got it!</p>
+        )}
+        {gameOver === "lost" && (
+          <p style={{ color: "red", fontWeight: "bold" }}>
+            Better luck tomorrow!
+          </p>
+        )}
+        {errorMessage && (
+          <p style={{ color: "red", fontWeight: "bold" }}>{errorMessage}</p>
+        )}
+        {!gameOver && (
+          <input
+            value={input}
+            placeholder="Type a guess or use the virtual keyboard"
+            onChange={onChangeInput}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSubmit();
+            }}
+          />
+        )}
+        <Grid guesses={guesses} currentGuess={currentGuess} turn={turn} />
+        <KeyboardWrapper
+          keyboardRef={(r: any) => (keyboard.current = r)}
+          onChange={(value: string) => {
+            const normalized = value.toUpperCase().slice(0, 5);
+            setInput(normalized);
+            setCurrentGuess(normalized);
+          }}
+          onKeyPress={handleSubmit}
+        />
+      </div>
+    </div>
+  );
 };
 
 export default WordleMain;

@@ -1,27 +1,31 @@
-
-export interface WordResponse {
-    date: string;
-    status: string;
+export interface LetterFeedback {
+  letter: string;
+  status: "green" | "yellow" | "grey";
 }
 
-export type LetterStatus = "green" | "yellow" | "gray";
+export interface WordResponse {
+  date: string;
+  status: string;
+}
+
+export type LetterStatus = "green" | "yellow" | "grey";
 export type TileColor = "green" | "yellow" | "grey";
 
 export interface LetterFeedback {
-    letter: string;
-    status: LetterStatus;
+  letter: string;
+  status: LetterStatus;
 }
 
 export interface GuessResponse {
-    feedback: LetterFeedback[];
-    won: boolean;
+  feedback: LetterFeedback[];
+  won: boolean;
 }
 
 export interface WordGuess {
-    guess: string;
+  guess: string;
 }
 
 export interface Tile {
-    key: string;
-    color: TileColor;
+  key: string;
+  color: TileColor;
 }
