@@ -88,8 +88,7 @@ const useWordle = () => {
 
             addNewGuess(normalizeResponse(response))
         } catch (submitError) {
-            console.error('Wordle submit error:', submitError)
-            setError('Unable to submit guess. Please try again.')
+            setError('Unable to submit guess.')
         } finally {
             setLoading(false)
         }
