@@ -7,9 +7,9 @@ const noop = () => {}; //in case the program has no values, we use this null
 
 // parent component
 interface IProps {
-  keyboardRef: (r: Component) => void;
+  keyboardRef: (r: any) => void;
   onChange: (input: string) => void;
-  onEnter: () => void;
+  onKeyPress?: (button: string) => void;
 }
 
 // Component
@@ -19,9 +19,7 @@ class KeyboardWrapper extends Component<IProps> {
   };
 
   onKeyPress = (button: string) => {
-    if (button === "{enter}") {
-      this.props.onEnter();
-    }
+    this.props.onKeyPress?.(button);
   };
 
   render() {

@@ -1,5 +1,4 @@
-import React, { useState, useRef } from "react";
-import type { ChangeEvent } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { KeyboardWrapper } from "../components/keyboard";
 import Grid from "../components/basicGrid";
 import { wordleApi } from "../services/wordleService";
@@ -101,7 +100,7 @@ const WordleMain = () => {
             setInput(normalized);
             setCurrentGuess(normalized);
           }}
-          onEnter={handleSubmit}
+          onKeyPress={handleSubmit}
         />
       </div>
     </div>
