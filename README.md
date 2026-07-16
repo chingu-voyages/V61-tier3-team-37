@@ -1,44 +1,49 @@
-# voyage-tasks
+# Wordle Clone
 
-Your project's `readme` is as important to success as your code. For
-this reason you should put as much care into its creation and maintenance
-as you would any other component of the application.
+## Overview
 
-If you are unsure of what should go into the `readme` let this article,
-written by an experienced Chingu, be your starting point -
-[Keys to a well written README](https://tinyurl.com/yk3wubft).
+- A Wordle clone built with a React/TypeScript frontend and a Python/FastAPI backend. Players have 6 attempts to guess a 5-letter word of the day, with color-coded tile feedback after each guess: green (correct position), yellow (wrong position), grey (not in word).
 
-And before we go there's "one more thing"! Once you decide what to include
-in your `readme` feel free to replace the text we've provided here.
+  ![alt text](image.png)
+  ![alt text](image-1.png)
+  ![alt text](image-2.png)
 
-> Own it & Make it your Own!
+### Tech Stack
 
-## Team Documents
+Frontend
 
-You may find these helpful as you work together to organize your project.
+- React 19 + TypeScript, built with Vite
+- Tailwind CSS + Material-UI for styling
+- Axios for API communication
+- react-simple-keyboard for the on-screen keyboard
 
-- [Team Project Ideas](./docs/team_project_ideas.md)
-- [Team Decision Log](./docs/team_decision_log.md)
+Backend
 
-Meeting Agenda templates (located in the `/docs` directory in this repo):
+- Python + FastAPI
+- Uvicorn server
 
-- Meeting - Voyage Kickoff --> ./docs/meeting-voyage_kickoff.docx
-- Meeting - App Vision & Feature Planning --> ./docs/meeting-vision_and_feature_planning.docx
-- Meeting - Sprint Retrospective, Review, and Planning --> ./docs/meeting-sprint_retrospective_review_and_planning.docx
-- Meeting - Sprint Open Topic Session --> ./docs/meeting-sprint_open_topic_session.docx
+## Features
+
+- The word of the day is selected deterministically using a date-based seed (YYYYMMDD) via GET /word, so every player gets the same word.
+- Guesses are submitted via POST /guess to the backend, which validates the input against a static word list and runs a two-pass algorithm to correctly handle duplicate letters.
+- For this project, the backend is stateless, so no session storage is needed.
 
 ## Backend Setup
 
 ### Prerequisites
+
 - Python 3.9+
 
 ### Installation
+
 1. Navigate to the backend directory:
+
    ```bash
    cd backend
    ```
 
 2. Create and activate a virtual environment:
+
    ```bash
    python3 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
@@ -50,6 +55,7 @@ Meeting Agenda templates (located in the `/docs` directory in this repo):
    ```
 
 ### Running the Server
+
 ```bash
 uvicorn main:app --reload
 ```
@@ -59,37 +65,36 @@ The API will be available at `http://127.0.0.1:8000`.
 ## Frontend Setup
 
 ### Prerequisites
+
 - Node.js 18+ (or compatible version)
 - npm
 
 ### Install
+
 1. Navigate to the frontend directory:
    cd frontend
-   
 2. Install dependencies:
    npm install
+
 ### Run locally
+
 `
 npm run dev
-
 
 Open the local Vite URL shown in the terminal (typically `http://localhost:5173`).
 
 ### Build for production
+
 ```bash
 npm run build
 ```
 
 ### Notes
+
 - The frontend uses `frontend/package-lock.json`.
 - Only commit/push `frontend/package-lock.json` when updating frontend dependencies.
 
 ## Our Team
-
-Everyone on your team should add their name along with a link to their GitHub
-& optionally their LinkedIn profiles below. Do this in Sprint #1 to validate
-your repo access and to practice PR'ing with your team _before_ you start
-coding!
 
 - Jackie: [GitHub](https://github.com/jackie-leary) / [LinkedIn](https://www.linkedin.com/in/jacqueline-bail-9a708111b/)
 - Jaynie: [GitHub](https://github.com/jaynie12) / [LinkedIn](https://www.linkedin.com/in/jaynie-shah/)
