@@ -4,9 +4,9 @@
 
 - A Wordle clone built with a React/TypeScript frontend and a Python/FastAPI backend. Players have 6 attempts to guess a 5-letter word of the day, with color-coded tile feedback after each guess: green (correct position), yellow (wrong position), grey (not in word).
 
-  ![alt text](image.png)
-  ![alt text](image-1.png)
-  ![alt text](image-2.png)
+  <img src="image.png" alt="alt text" width="330">
+  <img src="image-2.png" alt="alt text" width="150">
+  <img src="image-1.png" alt="alt text" width="340">
 
 ### Tech Stack
 
