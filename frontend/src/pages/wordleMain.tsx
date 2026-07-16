@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { KeyboardWrapper } from "../components/keyboard";
 import Grid from "../components/basicGrid";
+import { useKeyboard } from "../hooks/useKeyboard";
 import { wordleApi } from "../services/wordleService";
 
 const blankGuesses: { color: string; key: string }[][] = [
@@ -20,6 +21,32 @@ const WordleMain = () => {
   const [gameOver, setGameOver] = useState<"won" | "lost" | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const keyboard = useRef<any>(null);
+
+  const syncGuess = (nextGuess: string) => {
+    const normalized = nextGuess.toUpperCase().slice(0, 5);
+    setInput(normalized);
+    setCurrentGuess(normalized);
+
+    if (keyboard.current) {
+      keyboard.current.setInput(normalized);
+    }
+  };
+
+  const handleVirtualKey = (key: string) => {
+    if (key === "Enter") {
+      void handleSubmit();
+      return;
+    }
+
+    if (key === "Backspace") {
+      syncGuess(currentGuess.slice(0, -1));
+      return;
+    }
+
+    if (/^[a-zA-Z]$/.test(key)) {
+      syncGuess(`${currentGuess}${key}`);
+    }
+  };
 
   const handleSubmit = async () => {
     if (currentGuess.length !== 5 || turn >= 6 || gameOver) return;
@@ -42,11 +69,7 @@ const WordleMain = () => {
 
       setGuesses(newGuesses);
       setTurn(nextTurn);
-      setInput("");
-      setCurrentGuess("");
-      if (keyboard.current) {
-        keyboard.current.clearInput();
-      }
+      syncGuess("");
 
       if (result.won) {
         setGameOver("won");
@@ -59,14 +82,27 @@ const WordleMain = () => {
     }
   };
 
-  const onChangeInput = (event: ChangeEvent<HTMLInputElement>): void => {
-    const value = event.target.value.toUpperCase().slice(0, 5);
-    setInput(value);
-    setCurrentGuess(value);
-    if (keyboard.current) {
-      keyboard.current.setInput(value);
-    }
+  const onChangeInput = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    syncGuess(event.target.value);
   };
+
+  useKeyboard((key: string) => {
+    if (gameOver) return;
+
+    if (key === "Enter") {
+      void handleSubmit();
+      return;
+    }
+
+    if (key === "Backspace") {
+      syncGuess(currentGuess.slice(0, -1));
+      return;
+    }
+
+    if (/^[a-zA-Z]$/.test(key) && currentGuess.length < 5) {
+      syncGuess(`${currentGuess}${key.toUpperCase()}`);
+    }
+  }, !gameOver);
 
   return (
     <div className="wordle-page">
@@ -96,11 +132,9 @@ const WordleMain = () => {
         <KeyboardWrapper
           keyboardRef={(r: any) => (keyboard.current = r)}
           onChange={(value: string) => {
-            const normalized = value.toUpperCase().slice(0, 5);
-            setInput(normalized);
-            setCurrentGuess(normalized);
+            syncGuess(value);
           }}
-          onKeyPress={handleSubmit}
+          onKeyPress={handleVirtualKey}
         />
       </div>
     </div>

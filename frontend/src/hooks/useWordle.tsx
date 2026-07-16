@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { wordleApi } from "../services/wordleService";
-import type { WordGuessStatus } from "../types/word";
+import type { GuessResponse, WordGuess } from "../types/word";
 
 type FormattedLetter = {
   key: string;
@@ -20,9 +20,7 @@ const useWordle = (solution: string) => {
   const [usedKeys, setUsedKeys] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastResponse, setLastResponse] = useState<WordGuessStatus | null>(
-    null
-  );
+  const [lastResponse, setLastResponse] = useState<GuessResponse | null>(null);
 
   const formatGuess = () => {
     const solutionArray: Array<string | null> = [...solution];
@@ -50,19 +48,15 @@ const useWordle = (solution: string) => {
     return formattedGuess;
   };
 
-  const normalizeResponse = (response: WordGuessStatus): FormattedLetter[] => {
-    if (!response || !Array.isArray(response.lettersResponse)) {
+  const normalizeResponse = (response: GuessResponse): FormattedLetter[] => {
+    if (!response || !Array.isArray(response.feedback)) {
       return [];
     }
 
-    return response.lettersResponse.map((letter: any) => {
-      const key = letter.key ?? letter.letter ?? letter.value ?? "";
-      const color = letter.color ?? letter.status ?? "grey";
-      return {
-        key: String(key),
-        color: String(color),
-      };
-    });
+    return response.feedback.map((letter) => ({
+      key: String(letter.letter),
+      color: String(letter.status),
+    }));
   };
 
   const addNewGuess = (formattedGuess: FormattedLetter[]) => {
@@ -127,7 +121,9 @@ const useWordle = (solution: string) => {
     setError(null);
 
     try {
-      const response = await wordleApi.submitGuess({ word: currentGuess });
+      const response = await wordleApi.submitGuess({
+        guess: currentGuess,
+      } satisfies WordGuess);
       setLastResponse(response);
 
       const formattedResponse = normalizeResponse(response);
