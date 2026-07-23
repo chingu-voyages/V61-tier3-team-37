@@ -1,3 +1,4 @@
+import os
 from datetime import date
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -7,10 +8,15 @@ from game_logic import load_words, get_word_of_day, check_guess
 
 app = FastAPI()
 
-# Allow React frontend to call this API
+# Allow React frontend to call this API.
+# Local dev origins are always allowed; add production origins via the
+# ALLOWED_ORIGINS env var (comma-separated), e.g. https://your-frontend.up.railway.app
+DEFAULT_ORIGINS = ["http://localhost:3000", "http://localhost:5173", "http://127.0.0.1:5173"]
+extra_origins = [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "").split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=DEFAULT_ORIGINS + extra_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
